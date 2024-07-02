@@ -16,6 +16,16 @@ images.get(
     const width = parseInt(req.query.width as string, 10);
     const height = parseInt(req.query.height as string, 10);
 
+    if (!filename) {
+      res.status(400).send('Filename is required');
+      return;
+    }
+
+    if (width <= 0 || height <= 0) {
+      res.status(400).send('Invalid width or height');
+      return;
+    }
+
     const filePath: string = path.resolve(
       path.resolve(__dirname, '../assets/images/thumb'),
       `${filename}-${width}x${height}.jpg`
@@ -28,14 +38,17 @@ images.get(
     } catch {
       error = await Imagefile.createThumbnail(filename, width, height);
       if (error) {
-        res.send(error);
+        res.status(500).send(error);
+        return;
       }
     }
 
     const imagePath: null | string = await Imagefile.getImagePath(filename, width, height);
-    
+
     if (imagePath) {
       res.sendFile(imagePath);
+    } else {
+      res.status(500).send('Failed to retrieve image');
     }
   }
 );
