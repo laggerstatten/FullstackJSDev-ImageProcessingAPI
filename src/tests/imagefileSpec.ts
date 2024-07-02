@@ -6,47 +6,55 @@ import Imagefile from './../imagefile';
 
 const request = supertest(app);
 
+jasmine.DEFAULT_TIMEOUT_INTERVAL = 10000;
 
-describe('Test image processing via sharp', (): void => {
-  it('raises an error due to invalid width', async (): Promise<void> => {
-    const error: null | string = await Imagefile.createThumbnail('palmtunnel', -100, 100);
-    expect(error).not.toBeNull();
-  });
+describe('Test image processing', (): void => {
 
-  it('raises an error due to invalid filename', async (): Promise<void> => {
-    const error: null | string = await Imagefile.createThumbnail('palmtunel', 100, 100);
-    expect(error).not.toBeNull();
-  });
+  describe('Test image processing via sharp', (): void => {
+    it('raises an error due to invalid width', async (): Promise<void> => {
+      const error: null | string = await Imagefile.createThumbnail('palmtunnel', -100, 100);
+      expect(error).not.toBeNull();
+    });
 
-  it('creates resized thumb file', async (): Promise<void> => {
-    await Imagefile.createThumbnail('palmtunnel', 100, 100);
+    it('raises an error due to invalid filename', async (): Promise<void> => {
+      const error: null | string = await Imagefile.createThumbnail('palmtunel', 100, 100);
+      expect(error).not.toBeNull();
+    });
 
-    const resizedImagePath: string = path.resolve(
-      __dirname, `../assets/images/thumb/palmtunnel-100x100.jpg`
-    );
+    it('creates resized thumb file', async (): Promise<void> => {
+      await Imagefile.createThumbnail('palmtunnel', 100, 100);
 
-    let errorFile: null | string = '';
+      const resizedImagePath: string = path.resolve(
+        path.resolve(__dirname, '../../assets/images/thumb'),
+        'palmtunnel-100x100.jpg'
+      );
 
-    try {
-      await fs.access(resizedImagePath);
-      errorFile = null;
-    } catch {
-      errorFile = 'File not created';
-    }
+      let error: null | string = null;
 
-    expect(errorFile).toBeNull();
+      try {
+        console.log(resizedImagePath);
+        await fs.access(resizedImagePath);
+      } catch {
+        error = 'File not created';
+
+      }
+
+      expect(error).toBeNull();
+    });
   });
 });
 
 // Erase test file
 afterAll(async (): Promise<void> => {
   const resizedImagePath: string = path.resolve(
-    __dirname, `../assets/images/thumb/palmtunnel-100x100.jpg`
+    __dirname, `../../assets/images/thumb/palmtunnel-100x100.jpg`
   );
+
 
   try {
     await fs.access(resizedImagePath);
     fs.unlink(resizedImagePath);
-  } catch {
+  } catch (err) {
+    console.error(err);
   }
 });

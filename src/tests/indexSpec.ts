@@ -62,13 +62,14 @@ describe('Test responses from endpoints', (): void => {
 // Erase test file
 afterAll(async (): Promise<void> => {
   const resizedImagePath: string = path.resolve(
-    __dirname, `../assets/images/thumb/santamonica-100x100.jpg`
+    __dirname, `../../assets/images/thumb/santamonica-100x100.jpg`
   );
 
 
   try {
     await fs.access(resizedImagePath);
     fs.unlink(resizedImagePath);
-  } catch {
+  } catch (err) {
+    console.error(err);
   }
 });
