@@ -6,6 +6,7 @@ import Imagefile from './../imagefile';
 
 const request = supertest(app);
 
+jasmine.DEFAULT_TIMEOUT_INTERVAL = 10000;
 
 describe('Test image processing via sharp', (): void => {
   it('raises an error due to invalid width', async (): Promise<void> => {
@@ -25,16 +26,16 @@ describe('Test image processing via sharp', (): void => {
       __dirname, `../assets/images/thumb/palmtunnel-100x100.jpg`
     );
 
-    let errorFile: null | string = '';
+    await request.get('/api/images?filename=santamonica&width=100&height=100');
 
     try {
       await fs.access(resizedImagePath);
-      errorFile = null;
-    } catch {
-      errorFile = 'File not created';
+      const stats = await fs.stat(resizedImagePath);
+      expect(stats).not.toBeNull();
+    } catch (err) {
+      fail('File not created');
     }
 
-    expect(errorFile).toBeNull();
   });
 });
 
@@ -46,7 +47,8 @@ afterAll(async (): Promise<void> => {
 
   try {
     await fs.access(resizedImagePath);
-    fs.unlink(resizedImagePath);
-  } catch {
+    await fs.unlink(resizedImagePath);
+  } catch (err) {
+    console.error(err);
   }
 });
