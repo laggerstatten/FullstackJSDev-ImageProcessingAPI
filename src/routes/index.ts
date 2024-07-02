@@ -5,4 +5,12 @@ const routes: express.Router = express.Router();
 
 routes.use('/api/images', images);
 
+routes.get(
+    '/',
+    (request: express.Request, response: express.Response): void => {
+        response.send('');
+
+    }
+);
+
 export default routes;
